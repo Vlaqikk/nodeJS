@@ -13,7 +13,7 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            let socket = new WebSocket("ws://nodejs-1-uwbl.onrender.com:8080/index.js");
+            let socket = new WebSocket("ws://nodejs-1-uwbl.onrender.com");
 
             socket.onopen = function(event) {
                 console.log("[open] Connection established");
