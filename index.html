@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <title>WebSocket Timer</title>
+</head>
+<body>
+    <h1>Прощайте ихтиандры</h1>
+    <div id="ret"></div>
+    <input type="text" id="messageInput" placeholder="Введите сообщение">
+    <button id="sendMessage">Отправить</button>
+    <script>
+        $(document).ready(function() {
+            let socket = new WebSocket('ws://localhost:3000');
+
+            socket.onopen = function() {
+                console.log('WebSocket connection established');
+            };
+
+            socket.onmessage = function(event) {
+                console.log('Remaining time: ' + event.data + ' seconds');
+                $('#ret').text(event.data);
+            };
+
+            socket.onerror = function(error) {
+                console.error('WebSocket error: ' + error.message);
+            };
+
+            socket.onclose = function() {
+                console.log('WebSocket connection closed');
+            };
+
+            $('#sendMessage').click(function() {
+                let message = $('#messageInput').val();
+                socket.send(message);
+                // console.log('Message sent: ' + message);
+            });
+        });
+    </script>
+</body>
+</html>
