@@ -12,6 +12,7 @@ let remainingTime = 60; // Таймер на 60 секунд
 
 const timer = setInterval(() => {
     remainingTime++;
+    console.log(remainingTime);
     wss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
             client.send(remainingTime.toString());
@@ -37,5 +38,5 @@ wss.on('connection', (ws) => {
 const PORT = 5000;
 
 server.listen(PORT, () => {
-    console.log('WebSocket server is running');
+    console.log('WebSocket server is running on ws://localhost:5000');
 });
