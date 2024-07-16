@@ -1,35 +1,42 @@
 const http = require('http');
-const ws = require('ws');
+const WebSocket = require('ws');
 
-const wss = new ws.Server({noServer: true});
-console.log('-----')
-function accept(req, res) {
-  // все входящие запросы должны использовать websockets
-  if (!req.headers.upgrade || req.headers.upgrade.toLowerCase() != 'websocket') {
-    res.end();
-    return;
-  }
+const server = http.createServer((req, res) => {
+    res.writeHead(200, {'Content-Type': 'text/plain; charset=utf-8'});
+    res.end('WebSocket server is running');
+});
 
-  // может быть заголовок Connection: keep-alive, Upgrade
-  if (!req.headers.connection.match(/\bupgrade\b/i)) {
-    res.end();
-    return;
-  }
+const wss = new WebSocket.Server({ server });
 
-  wss.handleUpgrade(req, req.socket, Buffer.alloc(0), onConnect);
-}
+let remainingTime = 60; // Таймер на 60 секунд
 
-function onConnect(ws) {
-  ws.on('message', function (message) {
-    let name = message.match(/([\p{Alpha}\p{M}\p{Nd}\p{Pc}\p{Join_C}]+)$/gu) || "Гость";
-    ws.send(`Привет с сервера, ${name}!`);
+const timer = setInterval(() => {
+    remainingTime++;
+    console.log(remainingTime);
+    wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(remainingTime.toString());
+        }
+    });
+}, 1000);
 
-    setTimeout(() => ws.close(1000, "Пока!"), 5000);
-  });
-}
+wss.on('connection', (ws) => {
+    ws.send(`Timer started: ${remainingTime} seconds`);
 
-if (!module.parent) {
-  http.createServer(accept).listen(8080);
-} else {
-  exports.accept = accept;
-}
+    ws.on('message', (message) => {
+        console.log(`Received message: ${message}`);
+        // Обработка полученного сообщения
+        // Например, можно отправить сообщение обратно всем клиентам
+        wss.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(`Received: ${message}`);
+            }
+        });
+    });
+});
+
+const PORT = 5000;
+
+server.listen(PORT, () => {
+    console.log('WebSocket server is running on ws://localhost:5000');
+});
