@@ -8,25 +8,24 @@ const server = http.createServer((req, res) => {
 
 const wss = new WebSocket.Server({ server });
 
-let remainingTime = 60; // Таймер на 60 секунд
+let elapsedTime = 0; // Таймер на 60 секунд
 
 const timer = setInterval(() => {
-    remainingTime++;
-    console.log(remainingTime);
+    elapsedTime++;
+    console.log(elapsedTime);
     wss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
-            client.send(remainingTime.toString());
+            client.send(elapsedTime.toString());
         }
     });
 }, 1000);
 
 wss.on('connection', (ws) => {
-    ws.send(`Timer started: ${remainingTime} seconds`);
+    ws.send(`Timer started: ${elapsedTime} seconds`);
 
     ws.on('message', (message) => {
         console.log(`Received message: ${message}`);
-        // Обработка полученного сообщения
-        // Например, можно отправить сообщение обратно всем клиентам
+        // Отправка сообщения обратно всем клиентам
         wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
                 client.send(`Received: ${message}`);
