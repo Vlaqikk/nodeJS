@@ -2,7 +2,7 @@ const http = require('http');
 const ws = require('ws');
 
 const wss = new ws.Server({noServer: true});
-
+console.log('-----');
 function accept(req, res) {
   // все входящие запросы должны использовать websockets
   if (!req.headers.upgrade || req.headers.upgrade.toLowerCase() != 'websocket') {
@@ -27,10 +27,6 @@ function onConnect(ws) {
     setTimeout(() => ws.close(1000, "Пока!"), 5000);
   });
 }
-
-server.listen(PORT, () => {
-    console.log('WebSocket server is running on ws://localhost:5000');
-});
 
 if (!module.parent) {
   http.createServer(accept).listen(8080);
