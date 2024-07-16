@@ -12,36 +12,31 @@
     <input type="text" id="messageInput" placeholder="Введите сообщение">
     <button id="sendMessage">Отправить</button>
     <script type="text/javascript">
-        $(document).ready(function() {
-            let socket = new WebSocket('ws://54.254.162.138:5000/index.js');
+        let socket = new WebSocket("wss://javascript.info/article/websocket/demo/hello");
 
-            socket.onopen = () => {
-                console.log('ddd')
-            }
+socket.onopen = function(e) {
+  alert("[open] Соединение установлено");
+  alert("Отправляем данные на сервер");
+  socket.send("Меня зовут Джон");
+};
 
-            socket.onmessage = function(event) {
-                console.log('Remaining time: ' + event.data + ' seconds');
-                $('#ret').text(event.data);
-            };
+socket.onmessage = function(event) {
+  alert(`[message] Данные получены с сервера: ${event.data}`);
+};
 
-            socket.onerror = function(error) {
-                console.error('WebSocket error: ' + error.message);
-            };
+socket.onclose = function(event) {
+  if (event.wasClean) {
+    alert(`[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}`);
+  } else {
+    // например, сервер убил процесс или сеть недоступна
+    // обычно в этом случае event.code 1006
+    alert('[close] Соединение прервано');
+  }
+};
 
-            socket.onclose = function() {
-                console.log('WebSocket connection closed');
-            };
-
-            $('#sendMessage').click(function() {
-                let message = $('#messageInput').val();
-                socket.send(message);
-                // console.log('Message sent: ' + message);
-            });
-        });
-
-//                     var conn = new WebSocket('ws://54.191.253.12/index.js');
-// conn.onmessage = function(e){ console.log(e.data); };
-// conn.onopen = () => conn.send('hello');
+socket.onerror = function(error) {
+  alert(`[error]`);
+};
     </script>
 </body>
 </html>

@@ -1,32 +1,35 @@
-const WebSocket = require('ws');
+const http = require('http');
+const ws = require('ws');
 
-const wss = new WebSocket.Server({ port: 5000 });
+const wss = new ws.Server({noServer: true});
 
-let remainingTime = 60; // Таймер на 60 секунд
+function accept(req, res) {
+  // все входящие запросы должны использовать websockets
+  if (!req.headers.upgrade || req.headers.upgrade.toLowerCase() != 'websocket') {
+    res.end();
+    return;
+  }
 
-const timer = setInterval(() => {
-    remainingTime++;
-    console.log(remainingTime);
-    wss.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
-            client.send(remainingTime.toString());
-        }
-    });
-}, 1000);
+  // может быть заголовок Connection: keep-alive, Upgrade
+  if (!req.headers.connection.match(/\bupgrade\b/i)) {
+    res.end();
+    return;
+  }
 
-wss.on('connection', (ws) => {
-    ws.send(`Timer started: ${remainingTime} seconds`);
+  wss.handleUpgrade(req, req.socket, Buffer.alloc(0), onConnect);
+}
 
-    ws.on('message', (message) => {
-        console.log(`Received message: ${message}`);
-        // Обработка полученного сообщения
-        // Например, можно отправить сообщение обратно всем клиентам
-        wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(`Received: ${message}`);
-            }
-        });
-    });
-});
+function onConnect(ws) {
+  ws.on('message', function (message) {
+    let name = message.match(/([\p{Alpha}\p{M}\p{Nd}\p{Pc}\p{Join_C}]+)$/gu) || "Гость";
+    ws.send(`Привет с сервера, ${name}!`);
 
-console.log('WebSocket server is running on ws://localhost:5000');
+    setTimeout(() => ws.close(1000, "Пока!"), 5000);
+  });
+}
+
+if (!module.parent) {
+  http.createServer(accept).listen(8080);
+} else {
+  exports.accept = accept;
+}
