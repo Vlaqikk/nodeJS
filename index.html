@@ -12,37 +12,23 @@
     <button id="sendMessage">Send</button>
     
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            let socket = new WebSocket("ws://nodejs-1-uwbl.onrender.com");
-
-            socket.onopen = function(event) {
-                console.log("[open] Connection established");
-                console.log("Sending to server");
-                socket.send("Hello server!");
-            };
-
-            socket.onmessage = function(event) {
-                console.log(`[message] Data received from server: ${event.data}`);
-                document.getElementById('output').innerText = event.data;
-            };
-
-            socket.onclose = function(event) {
-                if (event.wasClean) {
-                    console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-                } else {
-                    console.log('[close] Connection died');
-                }
-            };
-
-            socket.onerror = function(error) {
-                console.error('[error]');
-            };
-
-            document.getElementById('sendMessage').addEventListener('click', () => {
-                let message = document.getElementById('messageInput').value;
-                socket.send(message);
-            });
-        });
+        var conn = new WebSocket('wss://nodejs-2-i0va.onrender.com');
+        conn.onopen = function(e) {
+            console.log("Connection established!");
+        };
+        setInterval(() => {
+          conn.send('Hello server!');
+        }, 1000);
+        conn.onmessage = function(e) {
+            console.log(e.data);
+        };
+        conn.onclose = function(e) {
+            console.log(e.code);
+            console.log(e.reason);
+        };              
+        conn.onerror = function(e) {
+            console.log(e);
+        };      
     </script>
 </body>
 </html>
