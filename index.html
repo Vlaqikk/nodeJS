@@ -3,32 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebSocket Example</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <title>WebSocket Timer</title>
 </head>
 <body>
-    <h1>WebSocket Example</h1>
-    <div id="output"></div>
-    <input type="text" id="messageInput" placeholder="Enter message">
-    <button id="sendMessage">Send</button>
-    
-    <script>
-        var conn = new WebSocket('wss://nodejs-2-i0va.onrender.com');
-        conn.onopen = function(e) {
-            console.log("Connection established!");
-        };
-        setInterval(() => {
-          conn.send('Hello server!');
-        }, 1000);
-        conn.onmessage = function(e) {
-            console.log(e.data);
-        };
-        conn.onclose = function(e) {
-            console.log(e.code);
-            console.log(e.reason);
-        };              
-        conn.onerror = function(e) {
-            console.log(e);
-        };      
+    <h1>Прощайте ихтиандры</h1>
+    <div id="ret"></div>
+    <input type="text" id="messageInput" placeholder="Введите сообщение">
+    <button id="sendMessage">Отправить</button>
+    <script type="text/javascript">
+        let socket = new WebSocket("wss://javascript.info/article/websocket/demo/hello");
+
+socket.onopen = function(e) {
+  alert("[open] Соединение установлено");
+  alert("Отправляем данные на сервер");
+  socket.send("Меня зовут Джон");
+};
+
+socket.onmessage = function(event) {
+  alert(`[message] Данные получены с сервера: ${event.data}`);
+};
+
+socket.onclose = function(event) {
+  if (event.wasClean) {
+    alert(`[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}`);
+  } else {
+    // например, сервер убил процесс или сеть недоступна
+    // обычно в этом случае event.code 1006
+    alert('[close] Соединение прервано');
+  }
+};
+
+socket.onerror = function(error) {
+  alert(`[error]`);
+};
     </script>
 </body>
 </html>
