@@ -28,6 +28,10 @@ function onConnect(ws) {
   });
 }
 
+server.listen(PORT, () => {
+    console.log('WebSocket server is running on ws://localhost:5000');
+});
+
 if (!module.parent) {
   http.createServer(accept).listen(8080);
 } else {

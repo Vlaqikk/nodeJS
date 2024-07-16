@@ -3,40 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <title>WebSocket Timer</title>
+    <title>WebSocket Example</title>
 </head>
 <body>
-    <h1>Прощайте ихтиандры</h1>
-    <div id="ret"></div>
-    <input type="text" id="messageInput" placeholder="Введите сообщение">
-    <button id="sendMessage">Отправить</button>
-    <script type="text/javascript">
-        let socket = new WebSocket("wss://javascript.info/article/websocket/demo/hello");
+    <h1>WebSocket Example</h1>
+    <div id="output"></div>
+    <input type="text" id="messageInput" placeholder="Enter message">
+    <button id="sendMessage">Send</button>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let socket = new WebSocket("ws://nodejs-1-uwbl.onrender.com:8080/index.js");
 
-socket.onopen = function(e) {
-  alert("[open] Соединение установлено");
-  alert("Отправляем данные на сервер");
-  socket.send("Меня зовут Джон");
-};
+            socket.onopen = function(event) {
+                console.log("[open] Connection established");
+                console.log("Sending to server");
+                socket.send("Hello server!");
+            };
 
-socket.onmessage = function(event) {
-  alert(`[message] Данные получены с сервера: ${event.data}`);
-};
+            socket.onmessage = function(event) {
+                console.log(`[message] Data received from server: ${event.data}`);
+                document.getElementById('output').innerText = event.data;
+            };
 
-socket.onclose = function(event) {
-  if (event.wasClean) {
-    alert(`[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}`);
-  } else {
-    // например, сервер убил процесс или сеть недоступна
-    // обычно в этом случае event.code 1006
-    alert('[close] Соединение прервано');
-  }
-};
+            socket.onclose = function(event) {
+                if (event.wasClean) {
+                    console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+                } else {
+                    console.log('[close] Connection died');
+                }
+            };
 
-socket.onerror = function(error) {
-  alert(`[error]`);
-};
+            socket.onerror = function(error) {
+                console.error('[error]');
+            };
+
+            document.getElementById('sendMessage').addEventListener('click', () => {
+                let message = document.getElementById('messageInput').value;
+                socket.send(message);
+            });
+        });
     </script>
 </body>
 </html>
