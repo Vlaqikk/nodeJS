@@ -42,19 +42,55 @@
 
 
 
+// const express = require('express');
+// const app = express();
+
+// const mongoose = require('mongoose');
+// // mongoose.connect(`mongodb+srv://ilinskyvladislav2002:!Mogilev2002@cluster0.vvw4bqu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`)
+
+// async function testMongo(){
+//     await mongoose.connect(`mongodb+srv://ilinskyvladislav2002:!Mogilev2002@cluster0.vvw4bqu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`)
+// }
+
+// const kittySchema = new mongoose.Schema({
+//     name: String
+// });
+
+// kittySchema.methods.speak = function speak() {
+//     const greeting = this.name
+//       ? 'Meow name is ' + this.name
+//       : 'I don\'t have a name';
+//     console.log(greeting);
+//   };
+  
+//   const Kitten = mongoose.model('Kitten', kittySchema);
+
+//   const fluffy = new Kitten({ name: 'fluffy' });
+// fluffy.speak(); // "Meow name is fluffy"
+
+// fluffy.save();
+// fluffy.speak();
+
+// const kittens = Kitten.find();
+// console.log(kittens);
+
+
 const express = require('express');
+const { connectToDb, getDb } = require('./db');
+
+const PORT = 3000;
+
 const app = express();
 
-const PORT = process.env.PORT || 5000;
+let db;
 
-const start = () => {
-    try {
-        app.listen(PORT, () => {
-            console.log(`server start on port ${PORT}`);
-        })
-    } catch (error) {
-        console.log(e);
-    }
-}
-
-start();
+connectToDb((err) => {
+  if (!err) {
+    app.listen(PORT, (err) => {
+      err ? console.log(err) : console.log(`Listening port ${PORT}`);
+    });
+    db = getDb();
+  } else {
+    console.log(`DB connection error: ${err}`);
+  }
+});
